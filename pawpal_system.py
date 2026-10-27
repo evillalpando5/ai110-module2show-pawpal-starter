@@ -19,11 +19,13 @@ class Task:
     completed: bool = False
 
     def edit_task(self, **kwargs) -> None:
+        """Update any task field by keyword argument."""
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
 
     def mark_completed(self) -> None:
+        """Mark this task as done."""
         self.completed = True
 
     def fits_in_window(self) -> bool:
@@ -53,21 +55,26 @@ class Pet:
     tasks: list[Task] = field(default_factory=list)
 
     def edit_pet_info(self, **kwargs) -> None:
+        """Update any pet field by keyword argument."""
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
 
     def add_task(self, task: Task) -> None:
+        """Append a task and stamp it with this pet's id."""
         task.pet_id = self.pet_id
         self.tasks.append(task)
 
     def remove_task(self, task_id: int) -> None:
+        """Remove the task with the given id from this pet's list."""
         self.tasks = [t for t in self.tasks if t.task_id != task_id]
 
     def get_task(self, task_id: int) -> Task | None:
+        """Return the task matching task_id, or None if not found."""
         return next((t for t in self.tasks if t.task_id == task_id), None)
 
     def due_tasks(self, today: date) -> list[Task]:
+        """Return incomplete tasks that are due on the given date."""
         return [t for t in self.tasks if not t.completed and t.is_due_today(today)]
 
 
@@ -79,15 +86,18 @@ class Owner:
     pets: list[Pet] = field(default_factory=list)
 
     def add_pet(self, pet: Pet) -> None:
+        """Append a pet and stamp it with this owner's id."""
         pet.owner_id = self.owner_id
         self.pets.append(pet)
 
     def edit_owner_info(self, **kwargs) -> None:
+        """Update any owner field by keyword argument."""
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
 
     def get_pet(self, pet_id: int) -> Pet | None:
+        """Return the pet matching pet_id, or None if not found."""
         return next((p for p in self.pets if p.pet_id == pet_id), None)
 
     def get_all_tasks(self, today: date | None = None) -> list[Task]:
@@ -105,9 +115,11 @@ class Scheduler:
     entries: list[dict] = field(default_factory=list)
 
     def _pet_for_task(self, task: Task) -> Pet:
+        """Look up the pet that owns a given task."""
         return self.owner.get_pet(task.pet_id)
 
     def generate_schedule(self) -> None:
+        """Build the day's schedule from all due tasks across every pet."""
         self.entries = []
         tasks = self.prioritize_tasks(self.owner.get_all_tasks(self.schedule_date))
         minutes_remaining = self.available_hours * 60
@@ -136,12 +148,15 @@ class Scheduler:
             current_time = end_time
 
     def check_constraints(self, task: Task, minutes_remaining: float) -> bool:
+        """Return True if the task fits its time window and the day's remaining time."""
         return task.fits_in_window() and task.duration <= minutes_remaining
 
     def prioritize_tasks(self, tasks: list[Task]) -> list[Task]:
+        """Sort tasks by priority ascending (1 = highest)."""
         return sorted(tasks, key=lambda t: t.priority)
 
     def display_plan(self) -> None:
+        """Print the day's schedule grouped by pet with AM/PM times."""
         date_str = self.schedule_date.strftime("%A, %B %d %Y")
         bar = "=" * 60
         print(f"\n{bar}")
@@ -167,6 +182,7 @@ class Scheduler:
         print(f"\n{bar}")
 
     def explain_plan(self) -> None:
+        """Print the reasoning behind each scheduled task."""
         bar = "=" * 60
         print(f"  Reasoning")
         print("  " + "─" * 44)
