@@ -5,7 +5,10 @@
 **a. Initial design**
 
 - Briefly describe your initial UML design.
+The UML design should have an owner class, pet class, tasks, and a schedule to display and arrange these classes. The owner should have a pet and a pet can have mutliple tasks associated to it. The schedule should be created based on duration of the task and the priority.
+
 - What classes did you include, and what responsibilities did you assign to each?
+I included 6 classes. Owner, pet, task, dailyschedule, scheduleentry, and schedulegenerator. The owner class has owner details and a pet. The pet cass contains details about the pet and can have care tasks attached to it. The schedule generator creates a daily schedule which is made of schedule entries. The schedule entries references a task and has a 
 
 **b. Design changes**
 

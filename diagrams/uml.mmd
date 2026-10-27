@@ -1,15 +1,60 @@
+
 classDiagram
-    %% Replace the placeholders below with your actual classes, attributes, methods, and relationships.
-    %% Keep this file updated so it matches your final implementation.
-
-    class ClassName {
-        +type attribute
-        +method() returnType
+    class Owner {
+        +int ownerId
+        +String name
+        +String email
+        +addPet()
+        +editOwnerInfo()
     }
 
-    class AnotherClass {
-        +type attribute
-        +method() returnType
+    class Pet {
+        +int petId
+        +String name
+        +String species
+        +String age
+        +String careNotes
+        +editPetInfo()
+        +addTask()
     }
 
-    ClassName --> AnotherClass : relationship
+    class Task {
+        +int taskId
+        +String title
+        +int duration
+        +int priority
+        +String earliestStart
+        +String latestEnd
+        +boolean completed
+        +editTask()
+        +markCompleted()
+    }
+
+    class DailySchedule {
+        +int scheduleId
+        +Date scheduleDate
+        +generatePlan()
+        +displayPlan()
+        +explainPlan()
+    }
+
+    class ScheduleEntry {
+        +int entryId
+        +String startTime
+        +String endTime
+        +String reasoning
+    }
+
+    class ScheduleGenerator {
+        +generateSchedule()
+        +checkConstraints()
+        +prioritizeTasks()
+        +calculateTimeSlots()
+    }
+
+    Owner "1" --> "0..*" Pet : owns
+    Pet "1" --> "0..*" Task : needs
+    DailySchedule "1" *-- "0..*" ScheduleEntry : contains
+    ScheduleEntry "*" --> "1" Task : schedules
+    ScheduleGenerator ..> Task : evaluates
+    ScheduleGenerator ..> DailySchedule : creates
