@@ -13,6 +13,21 @@ I included 6 classes. Owner, pet, task, dailyschedule, scheduleentry, and schedu
 **b. Design changes**
 
 - Did your design change during implementation?
+Missing relationships
+
+Owner → DailySchedule: The UML has no link between an owner and their schedule. The app needs to display a specific owner's daily plan, so there should be a direct association.
+ScheduleGenerator → Owner/Pet: The generator only references Task and DailySchedule in the UML, but it needs to know which pet's tasks to pull. Right now there's no path from generator → pet → tasks.
+Missing attributes
+
+Task has no pet_id or reference back to its parent Pet. Once tasks from multiple pets exist (the README says "add/edit tasks"), you can't tell which task belongs to which pet.
+DailySchedule has no pet_id either — if an owner has multiple pets, you can't distinguish schedules.
+Task has no recurrence field (daily vs. weekly), which the README's scheduling table explicitly calls out as a feature to handle.
+Logic bottlenecks
+
+ScheduleGenerator does everything: constraint checking, prioritization, slot calculation, and schedule creation. If any one of those methods has a bug, the whole plan breaks. Worth splitting checkConstraints and prioritizeTasks out so they can be tested independently — which aligns with the README's emphasis on testing key scheduling behaviors.
+DailySchedule.generatePlan() and ScheduleGenerator.generateSchedule() overlap in responsibility. It's unclear which one is the real entry point. You'll want to pick one (probably ScheduleGenerator) and make the other just a display/wrapper.
+There's no concept of a time budget (total available hours in a day). Without it, calculateTimeSlots has nothing to bound against, so the plan could schedule more tasks than the day allows.
+
 - If yes, describe at least one change and why you made it.
 
 ---

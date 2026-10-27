@@ -45,7 +45,28 @@ pip install -r requirements.txt
 ## 🖥️ Sample Output
 
 Paste a sample of your app's CLI or Streamlit output here so a reader can see what a generated plan looks like:
+============================================================
+  Daily Plan for Erika — Monday, October 26 2026
+============================================================
 
+  Biscuit (Dog)
+  ────────────────────────────────────────────
+  08:00 AM – 08:30 AM   Morning walk           ★ Priority 1
+  08:30 AM – 08:40 AM   Feeding                ★ Priority 2
+
+  Mochi (Cat)
+  ────────────────────────────────────────────
+  08:40 AM – 09:00 AM   Playtime               ★ Priority 3
+  09:00 AM – 09:15 AM   Brush fur              ★ Priority 4
+
+============================================================
+  Reasoning
+  ────────────────────────────────────────────
+  Morning walk     → Priority 1, fits in 30min window
+  Feeding          → Priority 2, fits in 10min window
+  Playtime         → Priority 3, fits in 20min window
+  Brush fur        → Priority 4, fits in 15min window
+============================================================
 ```
 # e.g.:
 # Daily plan for Biscuit (Golden Retriever):

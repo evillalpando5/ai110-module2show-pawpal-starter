@@ -4,57 +4,56 @@ classDiagram
         +int ownerId
         +String name
         +String email
+        +List pets
         +addPet()
         +editOwnerInfo()
+        +getPet()
+        +getAllTasks()
     }
 
     class Pet {
         +int petId
+        +int ownerId
         +String name
         +String species
         +String age
         +String careNotes
+        +List tasks
         +editPetInfo()
         +addTask()
+        +removeTask()
+        +getTask()
+        +dueTasks()
     }
 
     class Task {
         +int taskId
+        +int petId
         +String title
         +int duration
         +int priority
         +String earliestStart
         +String latestEnd
+        +String recurrence
         +boolean completed
         +editTask()
         +markCompleted()
+        +fitsInWindow()
+        +isDueToday()
     }
 
-    class DailySchedule {
-        +int scheduleId
+    class Scheduler {
+        +Owner owner
         +Date scheduleDate
-        +generatePlan()
+        +float availableHours
+        +List entries
+        +generateSchedule()
+        +checkConstraints()
+        +prioritizeTasks()
         +displayPlan()
         +explainPlan()
     }
 
-    class ScheduleEntry {
-        +int entryId
-        +String startTime
-        +String endTime
-        +String reasoning
-    }
-
-    class ScheduleGenerator {
-        +generateSchedule()
-        +checkConstraints()
-        +prioritizeTasks()
-        +calculateTimeSlots()
-    }
-
     Owner "1" --> "0..*" Pet : owns
     Pet "1" --> "0..*" Task : needs
-    DailySchedule "1" *-- "0..*" ScheduleEntry : contains
-    ScheduleEntry "*" --> "1" Task : schedules
-    ScheduleGenerator ..> Task : evaluates
-    ScheduleGenerator ..> DailySchedule : creates
+    Scheduler "1" --> "1" Owner : reads from
