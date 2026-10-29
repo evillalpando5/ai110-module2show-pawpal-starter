@@ -124,6 +124,8 @@ Describe your app in numbered steps so a reader can follow along without watchin
 4. Generate Schedule and review conflicts and scheduling logic.
 5. Mark off tasks as you complete them and you can regenerate schedule after.
 
-**Screenshot or video** *(optional)*: <!-- Insert a screenshot or link to a demo video here -->
+**Screenshot or video** *(optional)*: 
+
+https://github.com/user-attachments/assets/dda1ebe2-a335-4cdf-9b30-63b65192edca
 
 https://imgur.com/a/jcJjJPu
