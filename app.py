@@ -1,5 +1,5 @@
 import streamlit as st
-from datetime import date
+from datetime import date, datetime
 from pawpal_system import Owner, Pet, Task, Scheduler
 
 st.set_page_config(page_title="PawPal+", page_icon="🐾", layout="centered")
@@ -84,11 +84,31 @@ else:
     with col3:
         priority = st.number_input("Priority (1=high, 5=low)", min_value=1, max_value=5, value=2)
 
-    col4, col5 = st.columns(2)
-    with col4:
-        earliest_start = st.text_input("Earliest start (HH:MM)", value="08:00")
-    with col5:
-        latest_end = st.text_input("Latest end (HH:MM)", value="10:00")
+    st.caption("Set the time window for this task:")
+    col4a, col4b, col4c = st.columns(3)
+    with col4a:
+        start_hour = st.selectbox("Start hour", list(range(1, 13)), index=7, key="start_h")
+    with col4b:
+        start_min = st.selectbox("Start minute", ["00", "15", "30", "45"], key="start_m")
+    with col4c:
+        start_ampm = st.selectbox("Start", ["AM", "PM"], key="start_ampm")
+
+    col5a, col5b, col5c = st.columns(3)
+    with col5a:
+        end_hour = st.selectbox("End hour", list(range(1, 13)), index=9, key="end_h")
+    with col5b:
+        end_min = st.selectbox("End minute", ["00", "15", "30", "45"], key="end_m")
+    with col5c:
+        end_ampm = st.selectbox("End", ["AM", "PM"], key="end_ampm")
+
+    def _to_24h(hour, minute, ampm):
+        h = int(hour) % 12 + (12 if ampm == "PM" else 0)
+        return f"{h:02d}:{minute}"
+
+    earliest_start = _to_24h(start_hour, start_min, start_ampm)
+    latest_end     = _to_24h(end_hour,   end_min,   end_ampm)
+
+    st.caption(f"Window: {start_hour}:{start_min} {start_ampm} → {end_hour}:{end_min} {end_ampm}")
 
     recurrence = st.selectbox("Recurrence", ["daily", "weekly"])
 
@@ -108,11 +128,34 @@ else:
         st.success(f"Task '{task_title}' added to {selected_pet_name}!")
 
     if any(p.tasks for p in owner.pets):
-        st.write("**Current tasks:**")
-        for p in owner.pets:
-            for t in p.tasks:
-                status = "✅" if t.completed else "🔲"
-                st.write(f"{status} **{p.name}** — {t.title} ({t.duration}min, priority {t.priority})")
+        all_pet_tasks = owner.get_all_tasks()
+        # Use Scheduler to sort tasks chronologically for display
+        _display_scheduler = Scheduler(owner=owner, schedule_date=date.today(), available_hours=24.0)
+        sorted_tasks = _display_scheduler.sort_by_time(all_pet_tasks)
+        pending = _display_scheduler.filter_by_completion(sorted_tasks, completed=False)
+        done    = _display_scheduler.filter_by_completion(sorted_tasks, completed=True)
+
+        st.write("**Current tasks (sorted by start time):**")
+        pet_lookup = {p.pet_id: p for p in owner.pets}
+        for t in sorted_tasks:
+            pet = pet_lookup.get(t.pet_id)
+            start_ampm = datetime.strptime(t.earliest_start, "%H:%M").strftime("%I:%M %p")
+            status = "✅" if t.completed else "🔲"
+            col_info, col_btn = st.columns([5, 1])
+            with col_info:
+                st.write(
+                    f"{status} **{t.title}** — {pet.name if pet else '?'} | "
+                    f"{start_ampm} | {t.duration} min | Priority {t.priority} | {t.recurrence}"
+                )
+            with col_btn:
+                if not t.completed:
+                    if st.button("Done", key=f"complete_{t.task_id}"):
+                        pet.complete_task(task_id=t.task_id, completed_on=date.today())
+                        st.rerun()
+
+        col_p, col_d = st.columns(2)
+        col_p.metric("Pending", len(pending))
+        col_d.metric("Completed", len(done))
 
 st.divider()
 
@@ -133,16 +176,37 @@ if st.button("Generate schedule"):
         scheduler.generate_schedule()
 
         if not scheduler.entries:
-            st.warning("No tasks could be scheduled — check that task durations fit their time windows.")
+            st.warning("No tasks could be scheduled — check that task durations fit within their time windows.")
         else:
             st.success(f"Schedule generated for {date.today().strftime('%A, %B %d %Y')}!")
+
+            # --- Conflict warnings (shown before the schedule) ---
+            conflicts = scheduler.detect_conflicts()
+            if conflicts:
+                st.error(f"⚠️ {len(conflicts)} scheduling conflict(s) detected — review before your day starts:")
+                for warning in conflicts:
+                    # Extract the two task names for a friendlier message
+                    st.warning(warning)
+                st.caption("Tip: adjust a task's start time or duration to resolve overlaps.")
+
+            # --- Schedule table grouped by pet ---
+            task_duration = {t.task_id: t.duration for p in owner.pets for t in p.tasks}
             seen_pets = []
             for entry in scheduler.entries:
                 if entry["pet_id"] not in seen_pets:
                     seen_pets.append(entry["pet_id"])
                     st.markdown(f"**{entry['pet_name']} ({entry['pet_species']})**")
-                st.write(f"  {entry['start']} – {entry['end']}  |  {entry['title']}  |  ★ Priority {entry['priority']}")
+                    pet_entries = [e for e in scheduler.entries if e["pet_id"] == entry["pet_id"]]
+                    st.table([
+                        {
+                            "Time": f"{e['start']} – {e['end']}",
+                            "Task": e["title"],
+                            "Duration": f"{task_duration.get(e['task_id'], '?')} min",
+                            "Priority": f"★ {e['priority']}",
+                        }
+                        for e in pet_entries
+                    ])
 
-            with st.expander("Reasoning"):
+            with st.expander("Why was each task scheduled?"):
                 for entry in scheduler.entries:
                     st.write(f"**{entry['title']}** → {entry['reasoning']}")

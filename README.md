@@ -107,10 +107,12 @@ Sample test output:
 
 Describe your app in numbered steps so a reader can follow along without watching a video:
 
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
+1. Create an owner can be yourself or someone else.
+2. Add as many pets as you wish. Two were add.
+3. Create tasks for said pets. Two daily tasks created and one weekly. 
+4. Generate Schedule and review conflicts and scheduling logic.
+5. Mark off tasks as you complete them and you can regenerate schedule after.
 
 **Screenshot or video** *(optional)*: <!-- Insert a screenshot or link to a demo video here -->
+
+https://imgur.com/a/jcJjJPu

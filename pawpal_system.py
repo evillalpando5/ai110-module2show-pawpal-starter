@@ -169,20 +169,22 @@ class Scheduler:
         self.entries = []
         tasks = self.prioritize_tasks(self.owner.get_all_tasks(self.schedule_date))
         minutes_remaining = self.available_hours * 60
-        current_time = datetime(
-            self.schedule_date.year,
-            self.schedule_date.month,
-            self.schedule_date.day, 8, 0
-        )
         for task in tasks:
             if not self.check_constraints(task, minutes_remaining):
                 continue
             pet = self._pet_for_task(task)
-            end_time = current_time + timedelta(minutes=task.duration)
+            task_start = datetime(
+                self.schedule_date.year,
+                self.schedule_date.month,
+                self.schedule_date.day,
+                int(task.earliest_start.split(":")[0]),
+                int(task.earliest_start.split(":")[1]),
+            )
+            end_time = task_start + timedelta(minutes=task.duration)
             self.entries.append({
                 "task_id": task.task_id,
                 "title": task.title,
-                "start": current_time.strftime("%I:%M %p"),
+                "start": task_start.strftime("%I:%M %p"),
                 "end": end_time.strftime("%I:%M %p"),
                 "priority": task.priority,
                 "pet_id": task.pet_id,
@@ -191,7 +193,6 @@ class Scheduler:
                 "reasoning": f"Priority {task.priority}, fits in {task.duration}min window"
             })
             minutes_remaining -= task.duration
-            current_time = end_time
 
     def check_constraints(self, task: Task, minutes_remaining: float) -> bool:
         """Return True if the task fits its time window and the day's remaining time."""
