@@ -103,6 +103,17 @@ Sample test output:
 | Auto-Generate next occurance | Task.next_occurance() | creates same task based on reoccurance daily or weekly |
 | Mark a task as done | Pet.complete_task() | when a task is marked as done it will queue its replacement if reoccuring task |
 
+## ✨ Features
+
+- **Priority-based scheduling** — Tasks are sorted by priority (1 = highest) before being placed into the day's schedule. Higher-priority tasks are always scheduled first when time windows conflict.
+- **Time-window enforcement** — Each task is scheduled at its `earliest_start` time and must finish before its `latest_end`. Tasks whose duration exceeds their window are excluded automatically.
+- **Conflict detection** — After generating a schedule, the app checks every pair of entries for overlapping time slots using standard interval math (`a_start < b_end AND b_start < a_end`). Conflicts are shown as warnings in the UI so the owner can act before the day starts.
+- **Recurring tasks** — Tasks can recur `daily` or `weekly`. Completing a recurring task via `complete_task()` automatically creates the next occurrence with the correct future due date, keeping the task list self-updating.
+- **Chronological sorting** — The current-tasks table is sorted by `earliest_start` using `Scheduler.sort_by_time()`, giving a at-a-glance view of the day in time order.
+- **Completion filtering** — `Scheduler.filter_by_completion()` separates pending and done tasks. Pending and completed counts are displayed as live metrics in the UI.
+- **Multi-pet support** — An owner can manage any number of pets, each with their own independent task list. The schedule groups entries by pet for easy reading.
+- **Available-hours cap** — A slider lets the owner set how many hours they have today. Tasks are skipped once the remaining time budget runs out, preventing over-scheduling.
+
 ## 📸 Demo Walkthrough
 
 Describe your app in numbered steps so a reader can follow along without watching a video:
