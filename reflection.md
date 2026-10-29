@@ -42,6 +42,9 @@ There's no concept of a time budget (total available hours in a day). Without it
 **b. Tradeoffs**
 
 - Describe one tradeoff your scheduler makes.
+Back-to-back tasks are not flagged
+The test a_start < b_end and b_start < a_end uses strict <, so a task ending at exactly 08:30 and one starting at exactly 08:30 passes. That's usually correct (no actual overlap), but if a pet needs travel time between tasks it would be a false negative.
+
 - Why is that tradeoff reasonable for this scenario?
 
 ---

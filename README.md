@@ -97,10 +97,11 @@ Sample test output:
 
 | Feature | Method(s) | Notes |
 |---------|-----------|-------|
-| Task sorting | | e.g., by priority, duration |
-| Filtering | | e.g., skip tasks if time runs out |
-| Conflict handling | | e.g., overlapping time slots |
-| Recurring tasks | | e.g., daily vs. weekly |
+| Task sorting | Scheduler.sort_by_time() | sorts tasks by time desc |
+| Filtering | Scheduler.filter_by_completion() | sorts tasks by completed and not completed|
+| Conflict handling | Scheduler.defect_conflicts() | displays error message when tasks overlap |
+| Auto-Generate next occurance | Task.next_occurance() | creates same task based on reoccurance daily or weekly |
+| Mark a task as done | Pet.complete_task() | when a task is marked as done it will queue its replacement if reoccuring task |
 
 ## 📸 Demo Walkthrough
 
